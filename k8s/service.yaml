@@ -1,0 +1,13 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: swiggy-svc
+  namespace: swiggy
+spec:
+  selector:
+    app: swiggy
+  ports:
+    - protocol: TCP
+      port: 80
+      targetPort: 3000
+  type: ClusterIP
