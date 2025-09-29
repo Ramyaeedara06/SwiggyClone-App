@@ -6,7 +6,6 @@ pipeline {
     DOCKER_CREDENTIALS = "docker-registry-creds" // credential ID you created
   }
   options {
-    ansiColor('xterm')
     timestamps()
     buildDiscarder(logRotator(numToKeepStr: '10'))
   }
