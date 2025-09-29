@@ -1,20 +1,13 @@
-# ---- Builder ----
-FROM node:18-alpine AS builder
+FROM node:18 AS builder
 WORKDIR /app
 COPY package*.json ./
-RUN npm ci --production=false
+RUN npm ci
 COPY . .
 RUN npm run build || true
 
-# ---- Production image ----
-FROM node:18-alpine
+FROM node:18-slim
 WORKDIR /app
-ENV NODE_ENV=production
-# create non-root user
-RUN addgroup -S appgroup && adduser -S appuser -G appgroup
-COPY --from=builder /app/package*.json ./
-COPY --from=builder /app/src ./src
-RUN npm ci --production
-USER appuser
+COPY --from=builder /app ./
 EXPOSE 3000
-CMD [ "node", "src/index.js" ]
+CMD ["node", "src/index.js"]
+
