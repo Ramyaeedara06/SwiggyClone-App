@@ -1,8 +1,7 @@
 pipeline {
   agent any
   environment {
-    REGISTRY = "docker.io/ramyaeedara015"    // change this
-    IMAGE_NAME = "${REGISTRY}/swiggy-clone"
+    IMAGE_NAME = "ramyaeedara015/swiggy-clone" // Docker Hub repo
     DOCKER_CREDENTIALS = "docker-registry-creds" // credential ID you created
   }
   options {
