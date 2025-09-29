@@ -1,11 +1,9 @@
 pipeline {
   agent any
   environment {
-    // Change these to your values
-    REGISTRY = "docker.io/yourdockerhubuser"   // e.g., docker.io/myuser or <aws_account_id>.dkr.ecr.us-east-1.amazonaws.com
+    REGISTRY = "docker.io/ramyaeedara015"    // change this
     IMAGE_NAME = "${REGISTRY}/swiggy-clone"
-    DOCKER_CREDENTIALS = "docker-registry-creds"   // Jenkins credential id for registry (username/password)
-    KUBECONFIG_CREDENTIALS = "kubeconfig"          // Jenkins file-credential id containing kubeconfig
+    DOCKER_CREDENTIALS = "docker-registry-creds" // credential ID you created
   }
   options {
     ansiColor('xterm')
@@ -14,41 +12,29 @@ pipeline {
   }
   stages {
     stage('Checkout') {
-      steps {
-        checkout scm
-      }
+      steps { checkout scm }
     }
-
-    stage('Set metadata') {
+    stage('Set tag') {
       steps {
         script {
           COMMIT = sh(script: "git rev-parse --short HEAD", returnStdout: true).trim()
           BR = env.BRANCH_NAME ?: 'local'
           IMAGE_TAG = "${BR}-${COMMIT}"
-          echo "TAG -> ${IMAGE_TAG}"
+          echo "Using image tag: ${IMAGE_TAG}"
         }
       }
     }
-
-    stage('Install & Lint') {
+    stage('Install & Test') {
       steps {
         sh 'npm ci'
-        sh 'npm run lint || true'
-      }
-    }
-
-    stage('Unit tests') {
-      steps {
         sh 'npm test'
       }
     }
-
     stage('Build Docker image') {
       steps {
         sh "docker build -t ${IMAGE_NAME}:${IMAGE_TAG} ."
       }
     }
-
     stage('Login & Push') {
       steps {
         withCredentials([usernamePassword(credentialsId: DOCKER_CREDENTIALS, usernameVariable: 'DOCKER_USER', passwordVariable: 'DOCKER_PASS')]) {
@@ -63,32 +49,12 @@ pipeline {
         }
       }
     }
-
-    stage('Deploy to Kubernetes') {
-      steps {
-        withCredentials([file(credentialsId: KUBECONFIG_CREDENTIALS, variable: 'KUBECONFIG_FILE')]) {
-          sh '''
-            mkdir -p $HOME/.kube
-            cp $KUBECONFIG_FILE $HOME/.kube/config
-            # Replace the placeholder image name in k8s/deployment.yaml and apply
-            sed -i "s|REPLACE_IMAGE|${IMAGE_NAME}:${IMAGE_TAG}|" k8s/deployment.yaml || true
-            kubectl apply -f k8s/namespace.yaml || true
-            kubectl apply -f k8s/
-            kubectl rollout status deployment/swiggy-deployment -n swiggy --timeout=120s || true
-          '''
-        }
-      }
-    }
   }
   post {
-    success {
-      echo "Pipeline completed: ${IMAGE_NAME}:${IMAGE_TAG}"
-    }
-    failure {
-      echo "Pipeline failed."
-    }
-    always {
-      cleanWs()
-    }
+    success { echo "Build + push succeeded: ${IMAGE_NAME}:${IMAGE_TAG}" }
+    failure { echo "Pipeline failed, check the console output logs" }
+    always { cleanWs() }
   }
 }
+
+ 
