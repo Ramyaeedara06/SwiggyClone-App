@@ -53,7 +53,7 @@ pipeline {
         sh """
           export KUBECONFIG=${KUBECONFIG_PATH}
           echo "Updating deployment image..."
-          kubectl -n swiggy set image deployment/swiggy swiggy=${DOCKER_IMAGE}:${IMAGE_TAG} --record
+          kubectl -n swiggy set image deployment/swiggy swiggy=${IMAGE_NAME}:${IMAGE_TAG} --record
           kubectl -n swiggy rollout status deployment/swiggy --timeout=120s
         """
       }
