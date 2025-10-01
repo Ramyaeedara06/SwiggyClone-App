@@ -66,7 +66,9 @@ pipeline {
       steps {
         sh """
           echo "Waiting for pods to be ready..."
-          sleep 6
+          kubectl -n swiggy wait --for=condition=ready pod -l app=swiggy --timeout=60s
+          kubectl -n swiggy port-forward svc/swiggy-svc 30001:80 &
+          sleep 5
           curl --fail --max-time 10 http://127.0.0.1:30001 || (echo 'Smoke test failed' && exit 1)
         """
       }
