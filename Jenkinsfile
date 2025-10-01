@@ -3,6 +3,7 @@ pipeline {
   environment {
     IMAGE_NAME = "ramyaeedara015/swiggy-clone" // Docker Hub repo
     DOCKER_CREDENTIALS = "docker-registry-creds" // credential ID you created
+    KUBECONFIG_PATH = '/var/lib/jenkins/kube/sa.kubeconfig'
   }
   options {
     timestamps()
