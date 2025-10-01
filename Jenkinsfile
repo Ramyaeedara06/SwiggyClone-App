@@ -47,12 +47,27 @@ pipeline {
         }
       }
     }
-  }
-  post {
-    success { echo "Build + push succeeded: ${IMAGE_NAME}:${IMAGE_TAG}" }
-    failure { echo "Pipeline failed, check the console output logs" }
-    always { cleanWs() }
+    stage('Deploy to k3s') {
+      steps {
+        sh """
+          export KUBECONFIG=${KUBECONFIG_PATH}
+          echo "Updating deployment image..."
+          kubectl -n swiggy set image deployment/swiggy swiggy=${DOCKER_IMAGE}:${IMAGE_TAG} --record
+          kubectl -n swiggy rollout status deployment/swiggy --timeout=120s
+        """
+      }
+    }
+    stage('Smoke Test') {
+      steps {
+        sh """
+          echo "Waiting for pods to be ready..."
+          sleep 6
+          curl --fail --max-time 10 http://<EC2_PUBLIC_IP>:30001 || (echo 'Smoke test failed' && exit 1)
+        """
+      }
+    }
+post {
+    success { echo 'Deployment succeeded ✅' }
+    failure { echo 'Deployment failed — check logs & kubectl describe pods ❌' }
   }
 }
-
- 
