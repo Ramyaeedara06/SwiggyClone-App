@@ -4,7 +4,7 @@ metadata:
   name: swiggy-ingress
   namespace: swiggy
   annotations:
-    kubernetes.io/ingress.class: nginx
+    kubernetes.io/ingress.class: traefik
 spec:
   rules:
     - host: swiggy.example.com
