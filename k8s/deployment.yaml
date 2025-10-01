@@ -6,7 +6,7 @@ metadata:
   labels:
     app: swiggy
 spec:
-  replicas: 2
+  replicas: 1                       # t2.micro -> 1
   selector:
     matchLabels:
       app: swiggy
@@ -17,7 +17,7 @@ spec:
     spec:
       containers:
         - name: swiggy
-          image: REPLACE_IMAGE
+          image: ramyaeedara015/swiggy-clone:local-ee2777d
           imagePullPolicy: IfNotPresent
           ports:
             - containerPort: 3000
@@ -36,3 +36,10 @@ spec:
               port: 3000
             initialDelaySeconds: 30
             periodSeconds: 10
+          resources:
+            requests:
+              memory: "128Mi"
+              cpu: "100m"
+            limits:
+              memory: "256Mi"
+              cpu: "300m"
