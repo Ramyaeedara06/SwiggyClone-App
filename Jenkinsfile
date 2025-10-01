@@ -66,6 +66,7 @@ pipeline {
         """
       }
     }
+  }    
 post {
     success { echo 'Deployment succeeded ✅' }
     failure { echo 'Deployment failed — check logs & kubectl describe pods ❌' }
