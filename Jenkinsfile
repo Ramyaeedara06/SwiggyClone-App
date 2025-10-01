@@ -54,8 +54,8 @@ pipeline {
           export KUBECONFIG=${KUBECONFIG_PATH}
           kubectl create namespace swiggy --dry-run=client -o yaml | kubectl apply -f -
           echo "Updating deployment image..."
-          kubectl -n swiggy set image deployment/swiggy swiggy=${IMAGE_NAME}:${IMAGE_TAG} --record
-          kubectl -n swiggy rollout status deployment/swiggy --timeout=120s
+          kubectl -n swiggy set image deployment/swiggy-deployment swiggy=${IMAGE_NAME}:${IMAGE_TAG}
+          kubectl -n swiggy rollout status deployment/swiggy-deployment --timeout=120s
         """
       }
     }
