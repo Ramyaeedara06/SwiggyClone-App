@@ -67,7 +67,7 @@ pipeline {
         sh """
           echo "Waiting for pods to be ready..."
           sleep 6
-          curl --fail --max-time 10 http://<EC2_PUBLIC_IP>:30001 || (echo 'Smoke test failed' && exit 1)
+          curl --fail --max-time 10 http://127.0.0.1:30001 || (echo 'Smoke test failed' && exit 1)
         """
       }
     }
