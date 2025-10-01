@@ -17,7 +17,7 @@ spec:
     spec:
       containers:
         - name: swiggy
-          image: ramyaeedara015/swiggy-clone:local-ee2777d
+          image: ramyaeedara015/swiggy-clone:latest
           imagePullPolicy: IfNotPresent
           ports:
             - containerPort: 3000
