@@ -74,7 +74,7 @@ pipeline {
           kubectl -n swiggy port-forward pod/\\\$POD 30001:3000 >/tmp/port-forward.log 2>&1 & PF=\\\$!
           sleep 2
           # Test the app
-          curl --fail --max-time 10 http://127.0.0.1:30001 || (tail -n +1 /tmp/port-forward.log; kill \\\$PF; exit 1)
+          curl --fail --max-time 10 http://127.0.0.1:30001 || { tail -n +1 /tmp/port-forward.log; kill \\\$PF; exit 1 }
           # Stop port-forward
           kill \\\$PF || true
         """
