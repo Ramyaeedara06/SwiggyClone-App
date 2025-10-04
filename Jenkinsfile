@@ -67,9 +67,15 @@ pipeline {
         sh """
           echo "Waiting for pods to be ready..."
           kubectl -n swiggy wait --for=condition=ready pod -l app=swiggy --timeout=60s
-          kubectl -n swiggy port-forward svc/swiggy-svc 30001:80 &
-          sleep 5
-          curl --fail --max-time 10 http://127.0.0.1:30001 || (echo 'Smoke test failed' && exit 1)
+          # Get pod name
+          POD=$(kubectl -n swiggy get pod -l app=swiggy -o jsonpath='{.items[0].metadata.name}')
+          # Port-forward pod port 3000 to localhost:30001
+          kubectl -n swiggy port-forward pod/$POD 30001:3000 >/tmp/port-forward.log 2>&1 & PF=$!
+          sleep 2
+          # Test the app
+          curl --fail --max-time 10 http://127.0.0.1:30001 || (tail -n +1 /tmp/port-forward.log; kill $PF; exit 1)
+          # Stop port-forward
+          kill $PF || true
         """
       }
     }
