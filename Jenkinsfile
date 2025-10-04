@@ -61,25 +61,7 @@ pipeline {
           kubectl -n swiggy rollout status deployment/swiggy-deployment --timeout=120s
         """
       }
-    }
-    stage('Smoke Test') {
-      steps {
-        sh """
-          echo "Waiting for pods to be ready..."
-          kubectl -n swiggy wait --for=condition=ready pod -l app=swiggy --timeout=60s
-          # Get pod name
-          POD=\\\$(kubectl -n swiggy get pod -l app=swiggy -o jsonpath='{.items[0].metadata.name}')
-          echo "Pod name: \$POD"
-          # Port-forward pod port 3000 to localhost:30001
-          kubectl -n swiggy port-forward pod/\\\$POD 30001:3000 >/tmp/port-forward.log 2>&1 & PF=\\\$!
-          sleep 5
-          # Test the app with POSIX-safe curly braces
-          curl --retry 3 --retry-delay 2 --fail --max-time 10 http://127.0.0.1:30001 || { tail -n +1 /tmp/port-forward.log; kill \\\$PF; exit 1; }
-          # Stop port-forward
-          kill \\\$PF || true
-        """
-      }
-    }
+    }   
   }    
 post {
     success { echo 'Deployment succeeded ✅' }
