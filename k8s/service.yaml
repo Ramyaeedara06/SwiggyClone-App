@@ -4,10 +4,11 @@ metadata:
   name: swiggy-svc
   namespace: swiggy
 spec:
+  type: NodePort
   selector:
     app: swiggy
   ports:
     - protocol: TCP
-      port: 80
-      targetPort: 3000
-  type: ClusterIP
+      port: 80         # service port
+      targetPort: 80   # container port
+      nodePort: 30001  # node port to reach from host
